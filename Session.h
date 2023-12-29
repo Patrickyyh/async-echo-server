@@ -17,6 +17,10 @@ class Session{
     tcp::socket & Socket(){
         return this->_socket;
     }
+
+    /**
+     * Monitor if the client sent the message to the server
+    */
     void Start();
 
 
@@ -34,4 +38,21 @@ class Session{
         //write data back to the client (callback function)
         void handle_write(const boost::system::error_code & error);
 
+};
+
+
+class Server{
+    public:
+     Server(boost::asio::io_context & ioc , short port);
+
+    private:
+        // listen and accept the connection from the client
+        void start_accept();
+
+        // callback function after the connection has been accepted
+        void handle_accept(Session * new_session , const boost::system::error_code & error);
+
+        // Since the io_context could not be copied and only could be referenced 
+        boost::asio::io_context & _ioc;
+        boost::asio::ip::tcp::acceptor _acceptor;
 };
