@@ -4,35 +4,40 @@ using namespace std;
 void Session::Start(){
     //clear the buffer
     memset(this->_data ,  0, max_length);
+
+    // To avoid create different share_ptr points at the same session
+    // we could use the enable_shared_from_this to synchronize the reference count
     _socket.async_read_some(boost::asio::buffer(_data , max_length), 
-                            std::bind(&Session::handle_read , this , placeholders::_1 , placeholders::_2));
+                            std::bind(&Session::handle_read , this , placeholders::_1 , placeholders::_2 , shared_from_this()));
                         
 }
 
-void Session::handle_read(const boost::system::error_code & error, size_t bytes_transferred){
+void Session::handle_read(const boost::system::error_code & error, size_t bytes_transferred ,  std::shared_ptr<Session> _self_shared){
     
     if(!error){
         cout << "server received message: " << _data << endl;
         boost::asio::async_write(_socket, boost::asio::buffer(_data, bytes_transferred), 
-            std::bind(&Session::handle_write, this, placeholders::_1));
+            std::bind(&Session::handle_write, this, placeholders::_1 , _self_shared));
     }else{
         cout << "read error" << endl;
         //delete the session
-        delete this;
+        //delete this;
+        _server->clear_session(_uuid);
     }
 }
 
-void Session::handle_write(const boost::system::error_code & error){
+void Session::handle_write(const boost::system::error_code & error, std::shared_ptr<Session> _self_shared){
       if(!error){
     
         memset(this->_data , 0 , max_length);
         _socket.async_read_some(boost::asio::buffer(_data , max_length), 
-                            std::bind(&Session::handle_read , this , placeholders::_1 , placeholders::_2));
+                            std::bind(&Session::handle_read , this , placeholders::_1 , placeholders::_2, _self_shared));
 
     }else{
         cout << "write error" << endl;
         //delete the session
-        delete this;
+       // delete this;
+       _server->clear_session(_uuid)
     }
 }
 
@@ -46,6 +51,12 @@ _acceptor(ioc , tcp::endpoint(tcp::v4() , port)
     cout << "Server start success, on port: " << port << endl;
     start_accept();
  }
+
+
+
+void Server::clear_session(std::string uuid){
+    _session_collection.erase(uuid);
+}
 
  void Server::start_accept(){
     
@@ -81,7 +92,7 @@ _acceptor(ioc , tcp::endpoint(tcp::v4() , port)
         new_session->Start();
         
         // put the session into the map
-        _session_collection.insert(std::make_pair(new_session->get_uuid() , new_session));
+       _session_collection.insert(std::make_pair(new_session->get_uuid() , new_session));
 
     }else {
         // delete new_session;

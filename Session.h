@@ -13,7 +13,7 @@ using namespace std;
 const int RECVSIZE = 1024;
 class Server; 
 
-class Session{
+class Session:public std::enable_shared_from_this<Session>{
     public:
         Session(boost::asio::io_context& ioc, Server * server):_socket(ioc),_server(server){
             //generate an uuid when a session is created
@@ -46,10 +46,10 @@ class Session{
         char _data[max_length];
         
         //read the data from the client(callback function)
-        void handle_read(const boost::system::error_code & error, size_t bytes_transferred);
+        void handle_read(const boost::system::error_code & error, size_t bytes_transferred, std::shared_ptr<Session> _self_shared);
 
         //write data back to the client (callback function)
-        void handle_write(const boost::system::error_code & error);
+        void handle_write(const boost::system::error_code & error, std::shared_ptr<Session> _self_shared);
         Server * _server;
         std::string _uuid;
 
@@ -59,6 +59,9 @@ class Session{
 class Server{
     public:
      Server(boost::asio::io_context & ioc , short port);
+
+     // cleare the session
+     void clear_session(std::string uuid);
 
     private:
         // listen and accept the connection from the client
