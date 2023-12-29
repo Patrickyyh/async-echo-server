@@ -27,3 +27,10 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
       and find that the client is disconnected. Hence, an error will occurred and the session will be deleted with `delete this` operation.
    3. When the client is disconnected, the `handle_read` callback will also be invoked as well, hence now the the delete operation will be called twice
       which will lead to the memory issue.
+   4. **Reason**: we use the same socket to handle the `async_write` an `async_read` operation. 
+   5. **Possible solution**
+      1. make use of the share_pointer to extend the life-time of the Session instance.
+2. Other Limitation:
+   1. This is just an echo server
+   2. write and read are not fully separated(same thread and same socket)
+   
