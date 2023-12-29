@@ -33,4 +33,5 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
 2. Other Limitation:
    1. This is just an echo server
    2. write and read are not fully separated(same thread and same socket)
-   
+
+# 2 version:1.2 update
