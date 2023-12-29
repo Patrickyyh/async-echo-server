@@ -21,4 +21,9 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
 
 
 # 1 version:1 issue
-1. delete the session is not the safe
+1. delete the session is not a safe operation.
+   1. For example, when the server read the data from the client, handle_read callback function will be invoked
+   2. At this moment, the client disconnet, so when the async_write is called, its callback function `handle_write` will be invoked
+      and find that the client is disconnected. Hence, an error will occurred and the session will be deleted with `delete this` operation.
+   3. When the client is disconnected, the `handle_read` callback will also be invoked as well, hence now the the delete operation will be called twice
+      which will lead to the memory issue.
