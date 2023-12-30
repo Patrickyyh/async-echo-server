@@ -6,7 +6,6 @@
 class Server{
     public:
      Server(boost::asio::io_context & ioc , short port);
-
      // cleare the session
      void clear_session(std::string uuid);
 
@@ -17,7 +16,7 @@ class Server{
         // callback function after the connection has been accepted
         void handle_accept(std::shared_ptr<Session> new_session , const boost::system::error_code & error);
 
-        // Since the io_context could not be copied and only could be referenced 
+        // Since the io_context could not be copied and only could be referenced
         boost::asio::io_context & _ioc;
         boost::asio::ip::tcp::acceptor _acceptor;
 
