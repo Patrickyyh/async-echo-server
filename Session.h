@@ -13,6 +13,25 @@ using namespace std;
 const int RECVSIZE = 1024;
 class Server; 
 
+class MsgNode{
+    friend class Session;
+    public:
+        MsgNode(char * msg , int max_length){
+            _data = new char[max_length];
+            memcpy(_data , msg , max_length);
+        }
+
+        ~MsgNode(){
+            delete [] _data;
+        }
+
+    private:
+        int _current_length;
+        int _max_length;
+        char * _data;
+
+};
+
 class Session:public std::enable_shared_from_this<Session>{
     public:
         
