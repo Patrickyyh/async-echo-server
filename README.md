@@ -1,4 +1,4 @@
-# 1 Asio and proactive pattern 
+# 1 Asio and proactive pattern
 1. Your program initiates the connect operation by calling the I/O object:
 
 socket.async_connect(server_endpoint, your_completion_handler);
@@ -27,7 +27,7 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
       and find that the client is disconnected. Hence, an error will occurred and the session will be deleted with `delete this` operation.
    3. When the client is disconnected, the `handle_read` callback will also be invoked as well, hence now the the delete operation will be called twice
       which will lead to the memory issue.
-   4. **Reason**: we use the same socket to handle the `async_write` an `async_read` operation. 
+   4. **Reason**: we use the same socket to handle the `async_write` an `async_read` operation.
    5. **Possible solution**
       1. make use of the share_pointer to extend the life-time of the Session instance.
 2. Other Limitation:
@@ -39,4 +39,6 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
    2. We would like to change the echo server into a bidirectional server.
    3. Need to implement a MsgNode which stores the data.
    4. Since we have to make sure that the data/message we send from the previous send operation is completed, we need to put message/data node into a queue
-   5. Since we are not sure which thread call the callback function, hence we need to add a lock on the queue to handle the race condition. 
+   5. Since we are not sure which thread call the callback function, hence we need to add a lock on the queue to handle the race condition.
+   6. Modify the logic of the `handle_read` and `handle_write`.
+
