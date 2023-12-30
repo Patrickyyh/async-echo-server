@@ -2,7 +2,7 @@
 CXX = g++
 
 # Define any compile-time flags
-CXXFLAGS = -Wall -std=c++11
+CXXFLAGS = -Wall -std=c++11 -g
 
 # Define any directories containing header files
 INCLUDES = -I.
@@ -14,7 +14,7 @@ LFLAGS =
 LIBS = -lboost_system -lpthread
 
 # Define the C++ source files
-SRCS = main.cpp Session.cpp
+SRCS = main.cpp Server.cpp Session.cpp
 
 # Define the C++ object files
 OBJS = $(SRCS:.cpp=.o)
@@ -22,10 +22,10 @@ OBJS = $(SRCS:.cpp=.o)
 # Define the executable file 
 MAIN = server_app
 
-.PHONY: depend clean
+.PHONY: depend clean valgrind
 
 all:    $(MAIN)
-	@echo  Simple compiler named server_app has been compiled
+	@echo Simple compiler named server_app has been compiled
 
 $(MAIN): $(OBJS) 
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
@@ -42,6 +42,7 @@ clean:
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^
 
-# DO NOT DELETE THIS LINE -- make depend needs it
 valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./$(MAIN)
+
+# DO NOT DELETE THIS LINE -- make depend needs it

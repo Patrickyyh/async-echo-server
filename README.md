@@ -35,3 +35,6 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
    2. write and read are not fully separated(same thread and same socket)
 
 # 2 version:1.2 update
+   1. we extend the life-time of the Session.
+   2. We would like to change the echo server into a bidirectional server.
+   3. 
