@@ -138,15 +138,44 @@ void Session::handle_read(const boost::system::error_code &error, size_t bytes_t
 
                 if (bytes_transferred <= 0)
                 {
-                    ::memset(_data , 0, MAX_LENGTH);
-                     _socket.async_read_some(boost::asio::buffer(_data, MAX_LENGTH),
+                    ::memset(_data, 0, MAX_LENGTH);
+                    _socket.async_read_some(boost::asio::buffer(_data, MAX_LENGTH),
                                             std::bind(&Session::handle_read, this, placeholders::_1, placeholders::_2, _self_shared));
                     return;
                 }
 
                 continue;
             }
-            
+
+            int remain_msg_size = _recv_msg_node->_max_length - _recv_msg_node->_current_length;
+            if (bytes_transferred < remain_msg_size)
+            {
+                memcpy(_recv_msg_node->_data + _recv_msg_node->_current_length, _data + n_of_bytes_moved, bytes_transferred);
+                _recv_msg_node->_current_length += bytes_transferred;
+                ::memset(_data, 0, MAX_LENGTH);
+                _socket.async_read_some(boost::asio::buffer(_data, MAX_LENGTH),
+                                        std::bind(&Session::handle_read, this, placeholders::_1, placeholders::_2, _self_shared));
+                return;
+            }
+
+            memcpy(_recv_msg_node->_data + _recv_msg_node->_current_length, _data + n_of_bytes_moved, remain_msg_size);
+            _recv_msg_node->_current_length += remain_msg_size;
+            bytes_transferred -= remain_msg_size;
+            n_of_bytes_moved += remain_msg_size;
+            _recv_msg_node->_data[_recv_msg_node->_max_length] = '\0';
+            cout << "Receive msg: " << _recv_msg_node->_data << endl;
+            Send(_recv_msg_node->_data, _recv_msg_node->_max_length);
+
+            if_head_parsed = false;
+            _recv_head_node->clear_data();
+            if (bytes_transferred <= 0)
+            {
+                ::memset(_data, 0, MAX_LENGTH);
+                _socket.async_read_some(boost::asio::buffer(_data, MAX_LENGTH),
+                                        std::bind(&Session::handle_read, this, placeholders::_1, placeholders::_2, _self_shared));
+                return;
+            }
+            continue;
         }
     }
     else
