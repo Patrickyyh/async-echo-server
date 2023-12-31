@@ -7,6 +7,9 @@
 #include <mutex>
 #include "boost/uuid/uuid_generators.hpp"
 #include "boost/uuid/uuid_io.hpp"
+#define MESSAGE_LENGTH_HEAD_LENGTH 2
+#define MAX_LENGTH 2048
+
 
 using namespace boost;
 using boost::asio::ip::tcp;
@@ -19,15 +22,30 @@ class MsgNode
     friend class Session;
 
 public:
-    MsgNode(char *msg, int max_length)
+    MsgNode(char *msg, int max_length) : _max_length(max_length + MESSAGE_LENGTH_HEAD_LENGTH),
+                                         _current_length(0)
     {
-        _data = new char[max_length];
-        memcpy(_data, msg, max_length);
+        _data = new char[max_length + 1]();
+        memcpy(_data, &max_length, MESSAGE_LENGTH_HEAD_LENGTH);
+        memcpy(_data + MESSAGE_LENGTH_HEAD_LENGTH, msg, max_length);
+        _data[_max_length] = '\0';
+    }
+
+    MsgNode(short max_len) : _max_length(max_len), _current_length(0)
+    {
+        _data = new char[_max_length + 1]();
     }
 
     ~MsgNode()
     {
         delete[] _data;
+    }
+
+    void clear_data()
+    {
+        // clear the data over here
+        memset(_data, 0, _max_length);
+        _current_length = 0;
     }
 
 private:
@@ -78,5 +96,12 @@ private:
     std::string _uuid;
     std::queue<std::shared_ptr<MsgNode>> _send_queue;
     std::mutex _send_lock;
+
+    // data-structure for Msg
+    // To store the the msgNode received by the server
+    std::shared_ptr<MsgNode> _recv_msg_node;
+    // To store the head
+    std::shared_ptr<MsgNode> _recv_head_node;
+    bool if_head_parsed;
 
 };

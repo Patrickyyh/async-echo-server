@@ -42,7 +42,17 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
    5. Since we are not sure which thread call the callback function, hence we need to add a lock on the queue to handle the race condition.
    6. Modify the logic of the `handle_read` and `handle_write`.
    7. issue still not resolved:
-      1. Tcp fragmentation
+      1. data/message fragmentation might happend inside the server
 
-   
+
+# 3. version:2.1 update
+   1. use TLV format msg Data
+      1. `message.id` , `message.length`, `message content`
+      2. we use 2 bytes to store the length of the message content
+      3. So the total bytes of the message is length_of_message + 2 bytes
+   2. Create two share_ptrs to store the recv_msg_node and _recv_head_node
+      1. `_recv_head_node` store the head-info which is the length of the bytes
+
+
+
 
