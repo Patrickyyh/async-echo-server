@@ -34,11 +34,15 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
    1. This is just an echo server
    2. write and read are not fully separated(same thread and same socket)
 
-# 2 version:1.2 update
+# 2 version:2 update
    1. we extend the life-time of the Session.
    2. We would like to change the echo server into a bidirectional server.
    3. Need to implement a MsgNode which stores the data.
    4. Since we have to make sure that the data/message we send from the previous send operation is completed, we need to put message/data node into a queue
    5. Since we are not sure which thread call the callback function, hence we need to add a lock on the queue to handle the race condition.
    6. Modify the logic of the `handle_read` and `handle_write`.
+   7. issue still not resolved:
+      1. Tcp fragmentation
+
+   
 
