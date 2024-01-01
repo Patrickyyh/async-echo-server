@@ -42,18 +42,24 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
    5. Since we are not sure which thread call the callback function, hence we need to add a lock on the queue to handle the race condition.
    6. Modify the logic of the `handle_read` and `handle_write`.
    7. issue still not resolved:
-      1. data/message fragmentation might happend inside the server
+      1. data/message fragmentatio or Packet sticking might happend inside the server
 
 
-# 3. version:2.1 update
-   1. use TLV format msg Data
+
+# 3. version:2.1 update: resolve the TCP packet sticking issue.
+   1. Packet Sticking
+   Packet sticking, often encountered in stream-based transport protocols like TCP, occurs when multiple messages sent consecutively by the sender are not adequately delimited, making it challenging for the receiver to distinguish message boundaries. Common strategies to handle this include:
+      1. Length-Prefixed Messaging: Prefixing each message with a field indicating its length, allowing the receiver to determine the exact length of each message.
+      2. Delimiter-Based Framing: Using special characters or strings as message delimiters, ensuring these delimiters do not occur within the messages themselves.
+      3. Fixed-Length Messages: Employing messages of a consistent, fixed length, which is suitable for formats where message lengths are predictable and uniform.
+   2. use TLV format msg Data
       1. `message.id` , `message.length`, `message content`
       2. we use 2 bytes to store the length of the message content
       3. So the total bytes of the message is length_of_message + 2 bytes
-   2. Create two share_ptrs to store the recv_msg_node and _recv_head_node
+   3. Create two share_ptrs to store the recv_msg_node and _recv_head_node
       1. `_recv_head_node` store the head-info which is the length of the bytes
       2. `_recv_msg_node` store the content of the msg
-   3. Test the server
+   4. Test the server
       1. Let the frequency of message sending from the client > frequency of acceptence of the message from the server
       2. We seperate the read and write operation of the client by putting them into the different thread.
 

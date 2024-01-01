@@ -124,9 +124,10 @@ void CSession::HandleRead(const boost::system::error_code& error, size_t  bytes_
 					_server->clear_session(_uuid);
 					return;
 				}
+
+
+
 				_recv_msg_node = make_shared<MsgNode>(data_len);
-
-
 				if (bytes_transferred < data_len) {
 					memcpy(_recv_msg_node->_data + _recv_msg_node->_cur_len, _data + copy_len, bytes_transferred);
 					_recv_msg_node->_cur_len += bytes_transferred;
