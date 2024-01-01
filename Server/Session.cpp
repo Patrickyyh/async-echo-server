@@ -2,6 +2,7 @@
 #include "Session.h"
 #include "Server.h"
 #include <iostream>
+#include <iomanip>
 CSession::CSession(boost::asio::io_context& io_context, CServer* server):
 	_socket(io_context), _server(server), _b_close(false),_b_head_parse(false){
 	boost::uuids::uuid  a_uuid = boost::uuids::random_generator()();
@@ -24,6 +25,20 @@ void CSession::Start(){
 	::memset(_data, 0, MAX_LENGTH);
 	_socket.async_read_some(boost::asio::buffer(_data, MAX_LENGTH), std::bind(&CSession::HandleRead, this,
 		std::placeholders::_1, std::placeholders::_2, SharedSelf()));
+}
+
+//Print raw data
+void CSession::PrintRecvData(char * data , int length){
+    stringstream ss;
+    string result = "0x";
+    for (int i = 0 ; i < length ; i++){
+        string hexstr;
+        ss << hex << std::setw(2) << std::setfill('0') << int(data[i]) << endl;
+        ss >> hexstr;
+        result += hexstr;
+    }
+
+    std::cout << "receive raw data is : " << result << endl;
 }
 
 void CSession::Send(char* msg, int max_length) {
@@ -53,6 +68,8 @@ std::shared_ptr<CSession>CSession::SharedSelf() {
 void CSession::HandleWrite(const boost::system::error_code& error, std::shared_ptr<CSession> shared_self) {
 
 	if (!error) {
+
+
 		std::lock_guard<std::mutex> lock(_send_lock);
 		cout << "send data " << _send_que.front()->_data+HEAD_LENGTH << endl;
 		_send_que.pop();
@@ -72,6 +89,11 @@ void CSession::HandleWrite(const boost::system::error_code& error, std::shared_p
 void CSession::HandleRead(const boost::system::error_code& error, size_t  bytes_transferred, std::shared_ptr<CSession> shared_self){
 	if (!error) {
 		//number of bytes that have already handled
+         // We reduce the accept rate of the server to test data fragmentation handle operation
+        PrintRecvData(_data , bytes_transferred);
+        std::chrono::milliseconds dura(2000);
+        std::this_thread::sleep_for(dura);
+
 		int copy_len = 0;
 		while (bytes_transferred>0) {
 			if (!_b_head_parse) {

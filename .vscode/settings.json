@@ -2,6 +2,9 @@
     "files.associations": {
         "atomic": "cpp",
         "cstring": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "iostream": "cpp",
+        "iomanip": "cpp",
+        "ios": "cpp"
     }
 }

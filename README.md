@@ -52,6 +52,10 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
       3. So the total bytes of the message is length_of_message + 2 bytes
    2. Create two share_ptrs to store the recv_msg_node and _recv_head_node
       1. `_recv_head_node` store the head-info which is the length of the bytes
+      2. `_recv_msg_node` store the content of the msg
+   3. Test the server
+      1. Let the frequency of message sending from the client > frequency of acceptence of the message from the server
+      2. We seperate the read and write operation of the client by putting them into the different thread.
 
 
 

@@ -54,6 +54,7 @@ public:
 private:
 	void HandleRead(const boost::system::error_code& error, size_t  bytes_transferred, std::shared_ptr<CSession> shared_self);
 	void HandleWrite(const boost::system::error_code& error, std::shared_ptr<CSession> shared_self);
+    void PrintRecvData(char * data , int length);
 	tcp::socket _socket;
 	std::string _uuid;
 	char _data[MAX_LENGTH];
