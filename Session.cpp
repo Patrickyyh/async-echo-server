@@ -23,18 +23,20 @@ void Session::Send(char *msg, int max_length)
 
     if (pending)
         return;
-    boost::asio::async_write(_socket, boost::asio::buffer(msg, max_length),
+
+    auto & msgnode = _send_queue.front();
+    boost::asio::async_write(_socket, boost::asio::buffer(msgnode->_data, msgnode->_max_length),
                              std::bind(&Session::handle_write, this, placeholders::_1, shared_from_this()));
 }
 
 void Session::Start()
 {
     // clear the buffer
-    memset(this->_data, 0, max_length);
+    memset(this->_data, 0, MAX_LENGTH);
 
     // To avoid create different share_ptr points at the same session
     // we could use the enable_shared_from_this to synchronize the reference count
-    _socket.async_read_some(boost::asio::buffer(_data, max_length),
+    _socket.async_read_some(boost::asio::buffer(_data, MAX_LENGTH),
                             std::bind(&Session::handle_read, this, placeholders::_1, placeholders::_2, shared_from_this()));
 }
 
@@ -162,12 +164,13 @@ void Session::handle_read(const boost::system::error_code &error, size_t bytes_t
             _recv_msg_node->_current_length += remain_msg_size;
             bytes_transferred -= remain_msg_size;
             n_of_bytes_moved += remain_msg_size;
+
             _recv_msg_node->_data[_recv_msg_node->_max_length] = '\0';
             cout << "Receive msg: " << _recv_msg_node->_data << endl;
             Send(_recv_msg_node->_data, _recv_msg_node->_max_length);
-
             if_head_parsed = false;
             _recv_head_node->clear_data();
+
             if (bytes_transferred <= 0)
             {
                 ::memset(_data, 0, MAX_LENGTH);
