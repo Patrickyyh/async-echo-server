@@ -64,5 +64,8 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
       2. We seperate the read and write operation of the client by putting them into the different thread.
 
 
-
+# 3. version:2.1 big-endian and little-endian convertion.
+   1. Convert the host byte order into the network byte order and send it.
+   2. When received, convert the network byte order into the host byte order.
+   3. Define the maximum number of the data packet that the send_queue could handle.
 

@@ -8,6 +8,7 @@
 using namespace std;
 #define MAX_LENGTH  1024*2
 #define HEAD_LENGTH 2
+#define MAX_SENDQUEUE 1000
 using boost::asio::ip::tcp;
 class CServer;
 
@@ -17,7 +18,9 @@ class MsgNode
 public:
 	MsgNode(char * msg, short max_len):_total_len(max_len + HEAD_LENGTH),_cur_len(0){
 		_data = new char[_total_len+1]();
-		memcpy(_data, &max_len, HEAD_LENGTH);
+        //convert into th network byte order
+        int max_len_network = boost::asio::detail::socket_ops::host_to_network_long(max_len);
+		memcpy(_data, &max_len_network, HEAD_LENGTH);
 		memcpy(_data+ HEAD_LENGTH, msg, max_len);
 		_data[_total_len] = '\0';
 	}
