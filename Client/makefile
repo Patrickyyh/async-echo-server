@@ -1,4 +1,5 @@
 # Makefile for SyncServer
+UNAME := $(shell uname -s)
 
 # Compiler to use
 CXX = g++
@@ -12,16 +13,30 @@ TARGET = main
 # Source files
 SRC = SyncClient.cpp
 
+INCLUDES =
+
+LFLAGS = 
+
 # Object files
 OBJ = $(SRC:.cpp=.o)
 
+ifeq ($(UNAME), Linux)
+	INCLUDES += -I.
+	LFLAGS +=
+endif
+
+ifeq ($(UNAME), Darwin)
+	INCLUDES = -I/opt/homebrew/opt/boost/include
+	LFLAGS = -L/opt/homebrew/opt/boost/lib
+endif
+
 # Rule to create the executable
 $(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(TARGET) $(OBJ)
 
 # Rule to create object files
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $<
 
 # Clean up
 clean:

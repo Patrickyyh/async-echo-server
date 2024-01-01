@@ -10,7 +10,6 @@
 #define MESSAGE_LENGTH_HEAD_LENGTH 2
 #define MAX_LENGTH 2048
 
-
 using namespace boost;
 using boost::asio::ip::tcp;
 using namespace std;
@@ -25,7 +24,7 @@ public:
     MsgNode(char *msg, int max_length) : _max_length(max_length + MESSAGE_LENGTH_HEAD_LENGTH),
                                          _current_length(0)
     {
-        _data = new char[max_length + 1]();
+        _data = new char[_max_length + 1]();
         memcpy(_data, &max_length, MESSAGE_LENGTH_HEAD_LENGTH);
         memcpy(_data + MESSAGE_LENGTH_HEAD_LENGTH, msg, max_length);
         _data[_max_length] = '\0';
@@ -74,6 +73,7 @@ public:
      * Monitor if the client sent the message to the server
      */
     void Start();
+    void Close();
 
     void Send(char *msg, int max_length);
 
@@ -93,9 +93,11 @@ private:
     // write data back to the client (callback function)
     void handle_write(const boost::system::error_code &error, std::shared_ptr<Session> _self_shared);
     Server *_server;
+    bool _b_close;
     std::string _uuid;
     std::queue<std::shared_ptr<MsgNode>> _send_queue;
     std::mutex _send_lock;
+
 
     // data-structure for Msg
     // To store the the msgNode received by the server
@@ -103,5 +105,4 @@ private:
     // To store the head
     std::shared_ptr<MsgNode> _recv_head_node;
     bool if_head_parsed;
-
 };

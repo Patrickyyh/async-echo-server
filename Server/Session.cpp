@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-Session::Session(boost::asio::io_context &ioc, Server *server) : _socket(ioc), _server(server)
+Session::Session(boost::asio::io_context &ioc, Server *server) : _socket(ioc), _b_close(false), _server(server),if_head_parsed(false)
 {
     // generate an uuid when a session is created
     boost::uuids::uuid session_id = boost::uuids::random_generator()();
@@ -27,6 +27,11 @@ void Session::Send(char *msg, int max_length)
     auto & msgnode = _send_queue.front();
     boost::asio::async_write(_socket, boost::asio::buffer(msgnode->_data, msgnode->_max_length),
                              std::bind(&Session::handle_write, this, placeholders::_1, shared_from_this()));
+}
+
+void Session::Close(){
+    _socket.close();
+    _b_close = true;
 }
 
 void Session::Start()
@@ -212,6 +217,7 @@ void Session::handle_write(const boost::system::error_code &error, std::shared_p
     else
     {
         cout << "write error" << endl;
+        Close();
         // delete the session
         // delete this;
         _server->clear_session(_uuid);
