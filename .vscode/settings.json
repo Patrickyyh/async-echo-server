@@ -5,6 +5,11 @@
         "*.ipp": "cpp",
         "iostream": "cpp",
         "iomanip": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "__tree": "cpp",
+        "locale": "cpp",
+        "new": "cpp",
+        "queue": "cpp",
+        "typeinfo": "cpp"
     }
 }
