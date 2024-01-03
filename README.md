@@ -1,4 +1,4 @@
-# 1 Asio and proactive pattern
+#  Asio and proactive pattern
 1. Your program initiates the connect operation by calling the I/O object:
 
 socket.async_connect(server_endpoint, your_completion_handler);
@@ -20,7 +20,7 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
 
 
 
-# 1 version:1 issue
+# 1. version:1 issue
 1. delete the session is not a safe operation.
    1. For example, when the server read the data from the client, handle_read callback function will be invoked
    2. At this moment, the client disconnet, so when the async_write is called, its callback function `handle_write` will be invoked
@@ -34,7 +34,7 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
    1. This is just an echo server
    2. write and read are not fully separated(same thread and same socket)
 
-# 2 version:2 update
+# 2. version:2 update
    1. we extend the life-time of the Session.
    2. We would like to change the echo server into a bidirectional server.
    3. Need to implement a MsgNode which stores the data.
@@ -64,12 +64,12 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
       2. We seperate the read and write operation of the client by putting them into the different thread.
 
 
-# 3. version:2.1 big-endian and little-endian convertion.
+# 4. version:2.1 big-endian and little-endian convertion.
    1. Convert the host byte order into the network byte order and send it.
    2. When received, convert the network byte order into the host byte order.
    3. Define the maximum number of the data packet that the send_queue could handle.
 
-# 3. version:3 Reconstrure Business Logic layer
+# 5. version:3 Reconstrure Business Logic layer
    1. Adding JSON serialization using jsoncpp open source library
    2. Add logical layer (Business layer)into the server.
    3. logic layer is the sigleton thread.
