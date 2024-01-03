@@ -69,3 +69,10 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
    2. When received, convert the network byte order into the host byte order.
    3. Define the maximum number of the data packet that the send_queue could handle.
 
+
+
+
+# 3. version:3 Reconstrure
+   1. Adding JSON serialization using jsoncpp open source library
+   2. Add logical layer into the server.
+   3. 

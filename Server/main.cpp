@@ -1,6 +1,7 @@
 #include <iostream>
 #include <boost/asio.hpp>
 #include "Server.h"
+
 int main(){
     try
     {
@@ -8,7 +9,7 @@ int main(){
        using namespace std;
        CServer server(ioc,10086);
        ioc.run();
-       
+
 
     }
     catch(const std::exception& e)

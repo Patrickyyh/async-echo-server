@@ -33,8 +33,8 @@ ifeq ($(UNAME), Linux)
 endif
 
 ifeq ($(UNAME), Darwin)
-	INCLUDES = -I/opt/homebrew/opt/boost/include
-	LFLAGS = -L/opt/homebrew/opt/boost/lib
+	INCLUDES = -I/opt/homebrew/opt/boost/include -I/opt/homebrew/opt/jsoncpp/include
+	LFLAGS = -L/opt/homebrew/opt/boost/lib -L/opt/homebrew/opt/jsoncpp/lib
 endif
 
 .PHONY: depend clean valgrind

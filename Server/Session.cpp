@@ -29,7 +29,7 @@ void CSession::Start()
 {
     ::memset(_data, 0, MAX_LENGTH);
     _socket.async_read_some(boost::asio::buffer(_data, MAX_LENGTH), std::bind(&CSession::HandleRead, this,
-                                                                              std::placeholders::_1, std::placeholders::_2, SharedSelf()));
+                                                                            std::placeholders::_1, std::placeholders::_2, SharedSelf()));
 }
 
 // Print raw data
@@ -104,6 +104,7 @@ void CSession::HandleWrite(const boost::system::error_code &error, std::shared_p
         std::cout << "handle write failed, error is " << error.what() << endl;
         Close();
         _server->clear_session(_uuid);
+        // _server->clear_session(_uuid);
     }
 }
 
