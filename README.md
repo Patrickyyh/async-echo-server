@@ -72,7 +72,13 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
 # 5. version:3 Reconstrure Business Logic layer
    1. Adding JSON serialization using jsoncpp open source library
    2. Add logical layer (Business layer)into the server.
+      1. Why we seperate the asio layer and business logic layer
+         - suppose that, If we need to do some Blocking I/O operation, such as access the database,
+         this operation will take up the resources when we issue them inside the asio layer. As we know the asio use single thread to do the epoll, which indicates that it will not coninute working on next callback function until the previous one is done. This will effect the performance of the asio layer.
+         Hence, we need to create another thread inside the logich layer to call the callback function.
    3. logic layer is the sigleton thread.
+   4. logic layer is the consumer and the the asio layer is the producer
+      - so We need to use mutex and condition variable together to handle the race condition.
    4. Re-design the message Node
       1. Contains message id, message length, and message content
       2. Separate the Receiv message node and send message node.
