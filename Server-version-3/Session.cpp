@@ -6,7 +6,7 @@
 #include <json/json.h>
 #include <json/value.h>
 #include <json/reader.h>
-
+#include "LogicSystem.h"
 CSession::CSession(boost::asio::io_context &io_context, CServer *server) : _socket(io_context), _server(server), _b_close(false), _b_head_parse(false)
 {
     boost::uuids::uuid a_uuid = boost::uuids::random_generator()();
@@ -219,17 +219,20 @@ void CSession::HandleRead(const boost::system::error_code &error, size_t bytes_t
                 copy_len += msg_len;
                 bytes_transferred -= msg_len;
                 _recv_msg_node->_data[_recv_msg_node->_total_len] = '\0';
-                // cout << "receive data is " << _recv_msg_node->_data << endl;
-                Json::Reader reader;
-                Json::Value root;
-                reader.parse(std::string(_recv_msg_node->_data, _recv_msg_node->_total_len), root);
-                std::cout << "receiving msg is " << root["id"].asInt() << std::endl;
-                std::cout << "msg data is " << root["data"].asString() << std::endl;
-                root["data"] = "Server has received msg , msg is " + root["data"].asString();
-                std::string return_str = root.toStyledString();
+                // Put session and msg into the logic system.
+                LogicSystem::GetInstance()->PostMsgtoQueue(make_shared<LogicNode>(shared_from_this(), _recv_msg_node));
 
-                // Send(_recv_msg_node->_data, _recv_msg_node->_total_len);
-                Send(return_str, root["id"].asInt());
+                // cout << "receive data is " << _recv_msg_node->_data << endl;
+                // Json::Reader reader;
+                // Json::Value root;
+                // reader.parse(std::string(_recv_msg_node->_data, _recv_msg_node->_total_len), root);
+                // std::cout << "receiving msg is " << root["id"].asInt() << std::endl;
+                // std::cout << "msg data is " << root["data"].asString() << std::endl;
+                // root["data"] = "Server has received msg , msg is " + root["data"].asString();
+                // std::string return_str = root.toStyledString();
+
+                // // Send(_recv_msg_node->_data, _recv_msg_node->_total_len);
+                // Send(return_str, root["id"].asInt());
                 _b_head_parse = false;
                 _recv_head_node->Clear();
                 if (bytes_transferred <= 0)
@@ -261,14 +264,15 @@ void CSession::HandleRead(const boost::system::error_code &error, size_t bytes_t
 
             // Send(_recv_msg_node->_data, _recv_msg_node->_total_len);
 
-            Json::Reader reader;
-            Json::Value root;
-            reader.parse(std::string(_recv_msg_node->_data, _recv_msg_node->_total_len), root);
-            std::cout << "receiving msg id is " << root["id"].asInt() << std::endl;
-            std::cout << "msg data is " << root["data"].asString() << std::endl;
-            root["data"] = "Server has received msg , msg is " + root["data"].asString();
-            std::string return_str = root.toStyledString();
-            Send(return_str, root["id"].asInt());
+            // Json::Reader reader;
+            // Json::Value root;
+            // reader.parse(std::string(_recv_msg_node->_data, _recv_msg_node->_total_len), root);
+            // std::cout << "receiving msg id is " << root["id"].asInt() << std::endl;
+            // std::cout << "msg data is " << root["data"].asString() << std::endl;
+            // root["data"] = "Server has received msg , msg is " + root["data"].asString();
+            // std::string return_str = root.toStyledString();
+            // Send(return_str, root["id"].asInt());
+            LogicSystem::GetInstance()->PostMsgtoQueue(make_shared<LogicNode>(shared_from_this(), _recv_msg_node));
             _b_head_parse = false;
             _recv_head_node->Clear();
             if (bytes_transferred <= 0)
@@ -287,4 +291,8 @@ void CSession::HandleRead(const boost::system::error_code &error, size_t bytes_t
         Close();
         _server->clear_session(_uuid);
     }
+}
+
+LogicNode::LogicNode(shared_ptr<CSession> session, std::shared_ptr<ReciveNode> recvNode) : _session(session), _recvnode(recvNode)
+{
 }

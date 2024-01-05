@@ -4,6 +4,8 @@
 #include <boost/asio.hpp>
 #include "const.h"
 using boost::asio::ip::tcp;
+
+class LogicSystem;
 class MsgNode
 {
 public:
@@ -31,6 +33,9 @@ public:
 
 class ReciveNode : public MsgNode
 {
+
+    friend class LogicSystem;
+
 public:
     ReciveNode(short max_len, short msg_id);
 
