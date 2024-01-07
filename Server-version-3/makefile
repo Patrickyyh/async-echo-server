@@ -19,7 +19,7 @@ LFLAGS =
 LIBS = -lboost_system -lpthread -ljsoncpp
 
 # Define the C++ source files
-SRCS = main.cpp Server.cpp Session.cpp MsgNode.cpp
+SRCS = main.cpp Server.cpp Session.cpp MsgNode.cpp LogicSystem.cpp 
 
 # Define the C++ object files
 OBJS = $(SRCS:.cpp=.o)

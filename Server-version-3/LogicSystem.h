@@ -42,5 +42,5 @@ private:
     std::thread _worker_thread;
     bool _b_stop;
     // bind the message_id and its callback function
-    std::map<short, FunctionCallBack> _function_call_back
+    std::map<short, FunctionCallBack> _function_call_back;
 };

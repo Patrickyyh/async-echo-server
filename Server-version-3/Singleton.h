@@ -25,7 +25,7 @@ public:
         // Since this function could only called once
         //  Hence it is thread-safe
         std::call_once(s_flag, [&]()
-                       { _instance = shared_ptr<T>(new T); })
+                       { _instance = shared_ptr<T>(new T); });
 
             return _instance;
     }
