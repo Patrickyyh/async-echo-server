@@ -18,7 +18,6 @@ class LogicSystem : public Singleton<LogicSystem>
 
 public:
     ~LogicSystem();
-
     // send the data and session into the logic queue
     // called from the asio layer
     void PostMsgtoQueue(shared_ptr<LogicNode> msg);
