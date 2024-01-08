@@ -5,6 +5,7 @@
 #include <thread>
 #include <csignal>
 #include <mutex>
+#include <chrono>
 bool is_server_terminated = false;
 std::mutex mutex_terminated;
 std::condition_variable cond_terminated;
@@ -20,11 +21,13 @@ void signal_handler(int sig)
     }
 }
 
+std::vector<thread> vec_thread;
+
 int main()
 {
     try
     {
-        // initialize the 
+        // initialize the
 
         boost::asio::io_context ioc;
         std::thread network_thread([&ioc]
