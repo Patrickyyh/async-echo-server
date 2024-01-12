@@ -1,53 +1,32 @@
 #include <iostream>
-#include <boost/asio.hpp>
-#include "Server.h"
-#include "AsioServicePool.h"
-#include <thread>
+#include "CServer.h"
+#include "Singleton.h"
+#include "LogicSystem.h"
 #include <csignal>
+#include <thread>
 #include <mutex>
-#include <chrono>
-bool is_server_terminated = false;
-std::mutex mutex_terminated;
-std::condition_variable cond_terminated;
-
-void signal_handler(int sig)
-{
-    if (sig == SIGINT || sig == SIGTERM)
-    {
-        std::unique_lock<std::mutex> lock_quit(mutex_terminated);
-        is_server_terminated = true;
-        std::cout << " executed at here " << std::endl;
-        cond_terminated.notify_one();
-    }
-}
-
-std::vector<thread> vec_thread;
+#include "AsioIOServicePool.h"
+using namespace std;
+bool bstop = false;
+std::condition_variable cond_quit;
+std::mutex mutex_quit;
 
 int main()
 {
-    try
-    {
-        // initialize the
-
-        boost::asio::io_context ioc;
-        std::thread network_thread([&ioc]
-                                   {
-            CServer server(ioc, 10086);
-            ioc.run(); });
-
-        signal(SIGINT, signal_handler);
-        signal(SIGTERM, signal_handler);
-        while (!is_server_terminated)
-        {
-            std::unique_lock<std::mutex> lock_quit(mutex_terminated);
-            cond_terminated.wait(lock_quit);
-        }
-
-        ioc.stop();
-        network_thread.join();
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }
+	try
+	{
+		auto pool = AsioIOServicePool::GetInstance();
+		boost::asio::io_context io_context;
+		boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
+		signals.async_wait([&io_context, pool](const boost::system::error_code &error, int signal_number)
+						   {
+			io_context.stop();
+			pool->Stop(); });
+		CServer s(io_context, 10086);
+		io_context.run();
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << "Exception: " << e.what() << endl;
+	}
 }

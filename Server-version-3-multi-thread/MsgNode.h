@@ -1,53 +1,47 @@
 #pragma once
 #include <string>
+#include "const.h"
 #include <iostream>
 #include <boost/asio.hpp>
-#include "const.h"
+using namespace std;
 using boost::asio::ip::tcp;
-
 class LogicSystem;
 class MsgNode
 {
 public:
-    MsgNode(short max_len) : _total_len(max_len), _cur_len(0)
-    {
-        _data = new char[_total_len + 1]();
-        _data[_total_len] = '\0';
-    }
+	MsgNode(short max_len) :_total_len(max_len), _cur_len(0) {
+		_data = new char[_total_len + 1]();
+		_data[_total_len] = '\0';
+	}
 
-    void Clear()
-    {
-        ::memset(_data, 0, _total_len);
-        _cur_len = 0;
-    }
+	~MsgNode() {
+		std::cout << "destruct MsgNode" << endl;
+		delete[] _data;
+	}
 
-    ~MsgNode()
-    {
-        delete[] _data;
-    }
+	void Clear() {
+		::memset(_data, 0, _total_len);
+		_cur_len = 0;
+	}
 
-    short _cur_len;
-    short _total_len;
-    char *_data;
+	short _cur_len;
+	short _total_len;
+	char* _data;
 };
 
-class ReciveNode : public MsgNode
-{
-
-    friend class LogicSystem;
-
+class RecvNode :public MsgNode {
+	friend class LogicSystem;
 public:
-    ReciveNode(short max_len, short msg_id);
-
+	RecvNode(short max_len, short msg_id);
 private:
-    short _msg_id;
+	short _msg_id;
 };
 
-class SendNode : public MsgNode
-{
+class SendNode:public MsgNode {
+	friend class LogicSystem;
 public:
-    SendNode(const char *msg, short max_len, short msg_id);
-
+	SendNode(const char* msg,short max_len, short msg_id);
 private:
-    short _msg_id;
+	short _msg_id;
 };
+
