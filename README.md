@@ -83,4 +83,5 @@ This is a simplified picture of how Boost.Asio operates. You will want to delve 
       1. Contains message id, message length, and message content
       2. Separate the Receiv message node and send message node.
 
-
+# 6. version:3 Enhance the server's performance by concurrency
+In our previous designs, we used ASIO in a single-threaded mode. To enhance the efficiency of concurrent network I/O processing, we have now developed a multi-threaded mode of ASIO usage
